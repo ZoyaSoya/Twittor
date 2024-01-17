@@ -8,13 +8,12 @@ from src.models.SearchClass import MessageParams
 from src.elastic_interface.elasticsearch_utils import get_elasticsearch_client
 
 
-
-
 class MessageSearchRepository:
     _elasticsearch_client: AsyncElasticsearch
     _elasticsearch_index: str
 
-    def __init__(self, elasticsearch_index: str, elasticsearch_client: AsyncElasticsearch):
+    def __init__(self, elasticsearch_index: str,
+                 elasticsearch_client: AsyncElasticsearch):
         self._elasticsearch_index = elasticsearch_index
         self._elasticsearch_client = elasticsearch_client
 
@@ -46,28 +45,27 @@ class MessageSearchRepository:
 
         response = await self._elasticsearch_client.search(index=self._elasticsearch_index, query=query,
                                                            filter_path=["hits.hits._id", "hits.hits._source"])
-        if not response: return JSONResponse(content = {'status' : 'Not Found'}, status_code=status.HTTP_404_NOT_FOUND)
+        if not response:
+            return JSONResponse(
+                content={
+                    'status': 'Not Found'},
+                status_code=status.HTTP_404_NOT_FOUND)
         hits = response.body['hits']['hits']
         message = list(map(MessageParams.convert, hits))
         return message
-
 
     async def delete(self, mess_id: str):
         await (self._elasticsearch_client.delete(index=self._elasticsearch_index, id=mess_id))
 
     async def test_find(self, mess_id: str):
-       ex = await (self._elasticsearch_client.exists(index=self._elasticsearch_index, id=mess_id))
-       print(ex)
-       if ex is None:
-           print(f"Индекс {mess_id} существует")
-           return False
-       return ex
+        ex = await (self._elasticsearch_client.exists(index=self._elasticsearch_index, id=mess_id))
+        print(ex)
+        if ex is None:
+            print(f"Индекс {mess_id} существует")
+            return False
+        return ex
 
-
-
-
-
-    async def get_by_date(self, date1:str="2010-01-12", date2:str="now/d",size:int = 1) -> list[Messages]:
+    async def get_by_date(self, date1: str = "2010-01-12", date2: str = "now/d", size: int = 1) -> list[Messages]:
         query = {
             "range": {
                 "CreationDate": {
@@ -89,7 +87,10 @@ class MessageSearchRepository:
             filter_path=["hits.hits._id", "hits.hits._source"]
         )
         if not response:
-            return JSONResponse(content={'status': 'Not Found'}, status_code=status.HTTP_404_NOT_FOUND)
+            return JSONResponse(
+                content={
+                    'status': 'Not Found'},
+                status_code=status.HTTP_404_NOT_FOUND)
 
         hits = response.body['hits']['hits']
         print(hits)
@@ -98,6 +99,8 @@ class MessageSearchRepository:
         return message
 
     @staticmethod
-    def get_instance(elasticsearch_client: AsyncElasticsearch = Depends(get_elasticsearch_client)):
+    def get_instance(elasticsearch_client: AsyncElasticsearch = Depends(
+            get_elasticsearch_client)):
         elasticsearch_index = "messages2"
-        return MessageSearchRepository(elasticsearch_index, elasticsearch_client)
+        return MessageSearchRepository(
+            elasticsearch_index, elasticsearch_client)

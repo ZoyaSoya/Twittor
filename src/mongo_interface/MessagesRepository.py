@@ -17,8 +17,11 @@ def map_messages(mess: Any) -> Union[Messages, bool]:
         Score = (mess.get("Score", 0))
         ViewCount = (mess.get("ViewCount", 0))
         Body = (mess.get("Body", ''))
-        OwnerUserId = (mess.get("OwnerUserId",0))
-        LastActivityDate = (mess.get("LastActivityDate", '2040-01-12T15:45:19.963'))
+        OwnerUserId = (mess.get("OwnerUserId", 0))
+        LastActivityDate = (
+            mess.get(
+                "LastActivityDate",
+                '2040-01-12T15:45:19.963'))
         Title = (mess.get("Title", ''))
         Tags = (mess.get("Tags", ''))
         AnswerCount = (mess.get("AnswerCount", 0))
@@ -30,14 +33,23 @@ def map_messages(mess: Any) -> Union[Messages, bool]:
         print(f"Error occurred while mapping messages: {e}")
         return False
     finally:
-        return Messages(id=id, PostTypeId=PostTypeId,
-                        AcceptedAnswerId=AcceptedAnswerId,
-                        CreationDate=CreationDate,
-                        Score=Score, ViewCount=ViewCount, Body=Body,
-                        OwnerUserId=OwnerUserId, LastActivityDate=LastActivityDate,
-                        Title=Title, Tags=Tags, AnswerCount=AnswerCount, CommentCount=CommentCount,
-                        ContentLicense=ContentLicense, LastEditorUserId=LastEditorUserId, LastEditDate=LastEditDate
-                        )
+        return Messages(
+            id=id,
+            PostTypeId=PostTypeId,
+            AcceptedAnswerId=AcceptedAnswerId,
+            CreationDate=CreationDate,
+            Score=Score,
+            ViewCount=ViewCount,
+            Body=Body,
+            OwnerUserId=OwnerUserId,
+            LastActivityDate=LastActivityDate,
+            Title=Title,
+            Tags=Tags,
+            AnswerCount=AnswerCount,
+            CommentCount=CommentCount,
+            ContentLicense=ContentLicense,
+            LastEditorUserId=LastEditorUserId,
+            LastEditDate=LastEditDate)
 
 
 def get_filter(id: str) -> dict:
@@ -72,15 +84,16 @@ class MessageRepository:
         db_post = await self._db_collection.find_one(get_filter(mess_id))
 
         return map_messages(db_post)
+
     async def find_paginated(self, page: int, page_size: int) -> list[Messages]:
         skip = (page - 1) * page_size
-        db_mess=[]
+        db_mess = []
         async for mes in self._db_collection.find().skip(skip).limit(page_size):
             print(mes)
             db_mess.append(map_messages(mes))
         return db_mess
 
-    async def count_documents(self,skip:int )->list[Messages]:
+    async def count_documents(self, skip: int) -> list[Messages]:
         page_size = 15000
         db_mess = []
         total_documents = self._db_collection.count_documents({})
@@ -89,6 +102,8 @@ class MessageRepository:
             print(mes)
             db_mess.append(map_messages(mes))
         return db_mess
+
     @staticmethod
-    def get_instance(db_collection: AsyncIOMotorCollection = Depends(get_db_collections_mess)):
+    def get_instance(db_collection: AsyncIOMotorCollection = Depends(
+            get_db_collections_mess)):
         return MessageRepository(db_collection)

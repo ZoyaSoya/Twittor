@@ -37,6 +37,7 @@ def map_user(user: Any) -> Users:
         AccountId=AccountId
     )
 
+
 def get_filter(id: str) -> dict:
     return {'_id': ObjectId(id)}
 
@@ -72,12 +73,14 @@ class UserRepository:
 
     async def find_paginated(self, page: int, page_size: int) -> list[Users]:
         skip = (page - 1) * page_size
-        db_users=[]
+        db_users = []
         async for user in self._db_collection.find().skip(skip).limit(page_size):
             print(user)
             db_users.append(map_user(user))
         return db_users
+
     @staticmethod
-    def get_instance(db_collection: AsyncIOMotorCollection = Depends(get_db_collections_user)):
+    def get_instance(db_collection: AsyncIOMotorCollection = Depends(
+            get_db_collections_user)):
         print(UserRepository(db_collection))
         return UserRepository(db_collection)

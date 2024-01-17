@@ -12,7 +12,8 @@ class UserSearchRepository:
     _elasticsearch_client: AsyncElasticsearch
     _elasticsearch_index: str
 
-    def __init__(self, elasticsearch_index: str, elasticsearch_client: AsyncElasticsearch):
+    def __init__(self, elasticsearch_index: str,
+                 elasticsearch_client: AsyncElasticsearch):
         self._elasticsearch_index = elasticsearch_index
         self._elasticsearch_client = elasticsearch_client
 
@@ -24,18 +25,18 @@ class UserSearchRepository:
 
     async def delete(self, user_id: str):
         await (self._elasticsearch_client.delete(index=self._elasticsearch_index, id=user_id))
-        
+
     async def test_find(self, user_id: str):
-       ex = await (self._elasticsearch_client.exists(index=self._elasticsearch_index, id=user_id))
-       print(ex)
-       return ex
+        ex = await (self._elasticsearch_client.exists(index=self._elasticsearch_index, id=user_id))
+        print(ex)
+        return ex
 
     async def get_by_name(self, DisplayName: str) -> list[Users]:
         exact_match_query = {
             "match": {
                 "DisplayName": DisplayName
-                }
             }
+        }
         fuzzy_match_query = {
             "fuzzy": {
                 "DisplayName": {
@@ -52,16 +53,20 @@ class UserSearchRepository:
 
         response = await self._elasticsearch_client.search(index=self._elasticsearch_index, query=query,
                                                            filter_path=["hits.hits._id", "hits.hits._source"])
-        if not response: return JSONResponse(content={'status': 'Not Found'}, status_code=status.HTTP_404_NOT_FOUND)
+        if not response:
+            return JSONResponse(
+                content={
+                    'status': 'Not Found'},
+                status_code=status.HTTP_404_NOT_FOUND)
         hits = response.body['hits']['hits']
 
-
         print(hits)
-        user1 =list(map(MessageParams.convertUser, hits))
+        user1 = list(map(MessageParams.convertUser, hits))
 
         return user1
 
     @staticmethod
-    def get_instance(elasticsearch_client: AsyncElasticsearch = Depends(get_elasticsearch_client)):
+    def get_instance(elasticsearch_client: AsyncElasticsearch = Depends(
+            get_elasticsearch_client)):
         elasticsearch_index = "users3"
         return UserSearchRepository(elasticsearch_index, elasticsearch_client)

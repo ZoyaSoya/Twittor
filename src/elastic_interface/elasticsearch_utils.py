@@ -55,6 +55,7 @@ mapping = {
     }
 }
 
+
 async def connect_elasticsearch_and_init():
     global elasticsearch_client
     elasticsearch_url = os.getenv('ELASTICSEARCH_URI')
@@ -65,6 +66,7 @@ async def connect_elasticsearch_and_init():
 
     except Exception as Ex:
         print(f"elastic\t ERROR\t{Ex} | {elasticsearch_url}")
+
 
 async def close_connect_ES():
     if elasticsearch_client is None:

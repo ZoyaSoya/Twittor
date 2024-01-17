@@ -7,28 +7,32 @@ load_dotenv()
 db_client: AsyncIOMotorClient = None
 print(str(os.getenv("MONGO_DB")))
 
+
 async def get_db_collections_user() -> AsyncIOMotorCollection:
     mongo_db = (os.getenv('MONGO_DB'))
     mongo_collection = (os.getenv('MONGO_COLLECTION_USER'))
     print(mongo_collection)
     return db_client[mongo_db][mongo_collection]
 
+
 async def get_db_collections_mess() -> AsyncIOMotorCollection:
     mongo_db = os.getenv('MONGO_DB')
     mongo_collection = os.getenv('MONGO_COLLECTION_MESSAGE')
-    print (mongo_collection)
+    print(mongo_collection)
     return db_client[mongo_db][mongo_collection]
+
 
 async def connect_and_init_db():
     global db_client
     mongo_url = os.getenv('MONGO_URI')
     try:
         db_client = AsyncIOMotorClient(mongo_url)
-        
+
         print(f"mongo\t OK\t {mongo_url}")
     except Exception as Ex:
         print(f"mongo\t ERROR\t {Ex}")
         print(mongo_url)
+
 
 async def close_connect():
     global db_client

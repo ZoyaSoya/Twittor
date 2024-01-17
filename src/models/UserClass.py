@@ -6,27 +6,25 @@ class Users(BaseModel):
     Reputation: int
     CreationDate: str
     DisplayName: str
-    LastAccessDate:str
+    LastAccessDate: str
     WebsiteUrl: str
-    Location:str
-    AboutMe:str
-    Views:int
-    UpVotes:int
-    DownVotes:int
-    AccountId:str
+    Location: str
+    AboutMe: str
+    Views: int
+    UpVotes: int
+    DownVotes: int
+    AccountId: str
 
 
 class UpdateUserModel(BaseModel):
     Reputation: int
     CreationDate: str
     DisplayName: str
-    LastAccessDate:str
+    LastAccessDate: str
     WebsiteUrl: str
-    Location:str
-    AboutMe:str
-    Views:int
-    UpVotes:int
-    DownVotes:int
-    AccountId:str
-
-
+    Location: str
+    AboutMe: str
+    Views: int
+    UpVotes: int
+    DownVotes: int
+    AccountId: str
