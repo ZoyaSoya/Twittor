@@ -52,9 +52,9 @@ def registration():
             return redirect("/dashboard")
     return render_template('registration.html', wrong_pass_or_mail=True)
 
-@app.route('/error', methods=['POST', 'GET'])
-def error():
-    return render_template('undefined_page.html')
+@app.errorhandler(404)
+def error(e):
+    return render_template('undefined_page.html'), 404
 
 
 if __name__ == "__main__":
